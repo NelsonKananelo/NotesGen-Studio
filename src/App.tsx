@@ -15,9 +15,6 @@ import {
   CheckCircle2
 } from "lucide-react";
 
-// Initialize Gemini API
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
-
 interface ImageFile {
   id: string;
   file: File;
@@ -98,6 +95,11 @@ export default function App() {
     setSuccess(false);
 
     try {
+      if (!process.env.GEMINI_API_KEY) {
+        throw new Error("API_KEY_MISSING");
+      }
+      
+      const aiInstance = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
       const prompt = `Analyze these screenshots from a study material, lecture, or textbook. 
       Transform the content into high-quality, comprehensive, and well-structured study notes.
       
@@ -124,7 +126,7 @@ export default function App() {
         ]
       };
 
-      const response = await ai.models.generateContent({
+      const response = await aiInstance.models.generateContent({
         model: "gemini-3-flash-preview",
         contents
       });
@@ -137,7 +139,15 @@ export default function App() {
       setSuccess(true);
     } catch (err: any) {
       console.error("Generation error:", err);
-      setError(err?.message || "Failed to generate notes. Please try again.");
+      let message = err?.message || "Failed to generate notes. Please try again.";
+      
+      if (err?.message === "API_KEY_MISSING" || message.includes("403") || message.includes("PERMISSION_DENIED") || message.includes("API_KEY_INVALID")) {
+        message = "Missing or invalid API key. Please set your Gemini API key in the 'Settings > Secrets' panel to enable note generation.";
+      } else if (message.includes("429") || message.includes("RESOURCE_EXHAUSTED")) {
+        message = "Gemini API quota exceeded. If you continue to see this, consider selecting a billing-enabled API key in 'Settings > Secrets'.";
+      }
+
+      setError(message);
     } finally {
       setLoading(false);
     }
