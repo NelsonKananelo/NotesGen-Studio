@@ -299,7 +299,7 @@ export default function App() {
               <p>© {new Date().getFullYear()} NotesGen Studio</p>
               <p className="flex items-center gap-1">
                 <ImageIcon className="w-2.5 h-2.5" />
-                Powered by Gemini 3 Flash
+                Powered By by TECHLINK-ES
               </p>
             </div>
           </div>
