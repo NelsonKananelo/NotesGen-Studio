@@ -1,0 +1,6 @@
+{
+  "name": "NotesGen AI",
+  "description": "Transform screenshots of study materials into structured, comprehensive study notes and export them to PDF.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
